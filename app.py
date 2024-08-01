@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 from Models import db, User, Product, Order, OrderItem, Review
 from flask_cors import CORS
+from Blueprints.Routes.products import products_bp
 
 load_dotenv()
 
@@ -16,39 +17,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
-@app.route('/products', methods=['GET'])
-def get_products():
-    products = Product.query.all()
-    products_list = [
-        {
-            "id": product.id,
-            "name": product.name,
-            "description": product.description,
-            "price": str(product.price),
-            "category": product.category,
-            "imageUrl": product.image_url,
-            "created_at": product.created_at.isoformat()
-        }
-        for product in products
-    ]
-    return jsonify(products_list), 200
-
-@app.route('/products/<int:id>', methods=['GET'])
-def get_product(id):
-    product = Product.query.get(id)
-    if product is None:
-        return jsonify({'message': 'Product Not Found', }), 404
-    
-    product_data = {
-        "id": product.id,
-        "name": product.name,
-        "description": product.description,
-        "price": str(product.price),
-        "category": product.category,
-        "imageUrl": product.image_url,
-        "created_at": product.created_at.isoformat()
-    }
-    return jsonify(product_data), 200
+app.register_blueprint(products_bp)
 
 
 if __name__ == '__main__':
