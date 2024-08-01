@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
-from Models.models import db, User, Product, Order, OrderItem, Review
+from Models import db, User, Product, Order, OrderItem, Review
 from flask_cors import CORS
 
 load_dotenv()
