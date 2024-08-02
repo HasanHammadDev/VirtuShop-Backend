@@ -5,6 +5,8 @@ import os
 from Models import db, User, Product, Order, OrderItem, Review
 from flask_cors import CORS
 from Blueprints.Routes.products import products_bp
+from Blueprints.Routes.register import register_bp
+
 
 load_dotenv()
 
@@ -18,6 +20,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 app.register_blueprint(products_bp)
+app.register_blueprint(register_bp)
 
 
 if __name__ == '__main__':
