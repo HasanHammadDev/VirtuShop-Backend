@@ -13,6 +13,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
+app.config['SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'default_secret_key')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
