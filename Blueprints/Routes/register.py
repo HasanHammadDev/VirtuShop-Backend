@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, request
-from Models import User
+from Models import User, db
 from werkzeug.security import generate_password_hash
-from Models import db
 
 
 register_bp = Blueprint('user', __name__)
@@ -34,9 +33,4 @@ def register_user():
     except Exception as e:
         # Handle errors (such as database errors)
         db.session.rollback()  # Roll back any changes if an error occurs
-        return jsonify({'message': 'An error occurred.', 'error': str(e), 'success': False}), 500
-        
-
-
-
-    
+        return jsonify({'message': 'An error occurred.', 'success': False}), 500
