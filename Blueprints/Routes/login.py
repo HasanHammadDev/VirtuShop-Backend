@@ -1,40 +1,48 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, make_response
 from werkzeug.security import check_password_hash
 import jwt
-import datetime
+from datetime import datetime, timedelta, UTC
 from Models import User, db
 from dotenv import load_dotenv
 import os
 
-# Load environment variables from the .env file
 load_dotenv()
 
-auth_bp = Blueprint('auth', __name__)
+login_bp = Blueprint('login', __name__)
 
-auth_bp.route('/login', methods=['POST'])
+@login_bp.route('/login', methods=['POST'])
 def login():
     try:
+        # Check if the request is in JSON format
+        if not request.is_json:
+            return jsonify({'message': 'Missing JSON in request', 'success': False}), 400
+        
         login_info = request.get_json()
         email = login_info.get('email')
         password = login_info.get('password')
         
-        #Check if email or password is missing
+        # Check if email or password is missing
         if not email or not password:
             return jsonify({'message': 'All fields must be filled.', 'success': False}), 400
-        user = User.query.filter(email).first()
+
+        user = User.query.filter_by(email=email).first()
         if user and check_password_hash(user.password, password):
             # Generate JWT token
             token = jwt.encode(
                 {
                     'sub': user.id,
-                    'iat': datetime.datetime.utcnow(),
-                    'exp': datetime.datetime.utcnow() + datetime.timedelta(days=1)
+                    'iat': datetime.now(UTC),
+                    'exp': datetime.now(UTC) + timedelta(days=1)
                 },
                 os.getenv('JWT_SECRET_KEY'),
                 algorithm='HS256'
             )
-            return jsonify({'message': 'Login Successful', 'token': token, 'success': True}), 200
+            # Set token in an httpOnly cookie
+            response = make_response(jsonify({'message': 'Login Successful', 'success': True}), 200)
+            response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax')
+            return response
         
         return jsonify({'message': 'Login Failed', 'success': False}), 401
     except Exception as e:
+        print(f"An error occurred: {str(e)}")
         return jsonify({'message': 'An error occurred.', 'success': False}), 500
