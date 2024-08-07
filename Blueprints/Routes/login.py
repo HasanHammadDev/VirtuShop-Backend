@@ -2,9 +2,10 @@ from flask import Blueprint, jsonify, request, make_response
 from werkzeug.security import check_password_hash
 import jwt
 from datetime import datetime, timedelta, UTC
-from Models import User, db
+from Models import User
 from dotenv import load_dotenv
 import os
+from Auth.utils import token_required
 
 load_dotenv()
 
@@ -40,9 +41,18 @@ def login():
             # Set token in an httpOnly cookie
             response = make_response(jsonify({'message': 'Login Successful', 'success': True}), 200)
             response.set_cookie('token', token, httponly=True, secure=True, samesite='Lax')
-            return response
+            return response, 200
         
         return jsonify({'message': 'Login Failed', 'success': False}), 401
     except Exception as e:
         print(f"An error occurred: {str(e)}")
         return jsonify({'message': 'An error occurred.', 'success': False}), 500
+    
+@login_bp.route('/validate-token', methods=['GET'])
+@token_required
+def validate_token(current_user):
+    try:
+        return jsonify({'message': 'Token validated','success': True})
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return jsonify({'message': 'Token was not validated', 'success': False})
