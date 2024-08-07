@@ -31,11 +31,6 @@ app.register_blueprint(logout_bp)
 app.register_blueprint(profile_bp)
 
 
-@app.route('/protected', methods=['GET'])
-@token_required
-def protected_route(current_user):
-    return jsonify({'message': f'Hello, {current_user.username}! This is a protected route. {current_user.email}', 'success': True})
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
