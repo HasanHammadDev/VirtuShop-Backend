@@ -7,6 +7,8 @@ from flask_cors import CORS
 from Blueprints.Routes.products import products_bp
 from Blueprints.Routes.register import register_bp
 from Blueprints.Routes.login import login_bp
+from Blueprints.Routes.logout import logout_bp
+from Blueprints.Routes.profile import profile_bp
 from Auth.utils import token_required
 
 
@@ -25,6 +27,8 @@ db.init_app(app)
 app.register_blueprint(products_bp)
 app.register_blueprint(register_bp)
 app.register_blueprint(login_bp)
+app.register_blueprint(logout_bp)
+app.register_blueprint(profile_bp)
 
 
 @app.route('/protected', methods=['GET'])
