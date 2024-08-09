@@ -2,14 +2,14 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
-from Models import db, User, Product, Order, OrderItem, Review
+from Models import db
 from flask_cors import CORS
 from Blueprints.Routes.products import products_bp
 from Blueprints.Routes.register import register_bp
 from Blueprints.Routes.login import login_bp
 from Blueprints.Routes.logout import logout_bp
 from Blueprints.Routes.profile import profile_bp
-from Auth.utils import token_required
+from Blueprints.Routes.cart import cart_bp
 
 
 load_dotenv()
@@ -29,6 +29,7 @@ app.register_blueprint(register_bp)
 app.register_blueprint(login_bp)
 app.register_blueprint(logout_bp)
 app.register_blueprint(profile_bp)
+app.register_blueprint(cart_bp)
 
 
 
