@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request, make_response
-from Models import User
 from Auth.utils import token_required
 
 
