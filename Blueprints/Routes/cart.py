@@ -57,3 +57,42 @@ def add_to_cart(current_user):
         db.session.rollback()
         print(f"An error occurred: {str(e)}")
         return jsonify({'message': 'An error occurred.', 'success': False}), 500
+    
+@cart_bp.route('/cart', methods=['GET'])
+@token_required
+def get_cart(current_user):
+    try:
+        order = Order.query.filter_by(user_id=current_user.id, status='pending').first()
+
+        if not order:
+            return jsonify({'message': 'No pending orders found.', 'success': False}), 404
+
+        order_items = OrderItem.query.filter_by(order_id=order.id).all()
+
+        # Get all product_ids to fetch them in one go
+        product_ids = [order_item.product_id for order_item in order_items]
+        products = Product.query.filter(Product.id.in_(product_ids)).all()
+
+        # Map products by their id for quick access
+        product_map = {product.id: product for product in products}
+
+        # Construct the order items list
+        order_items_list = [
+            {
+                'quantity': order_item.quantity,
+                'price': order_item.price,
+                'created_at': order_item.created_at,
+                'products_information': {
+                    'product_name': product_map[order_item.product_id].name,
+                    'description': product_map[order_item.product_id].description,
+                    'price': product_map[order_item.product_id].price,
+                    'image_url': product_map[order_item.product_id].image_url
+                }
+            }
+            for order_item in order_items
+        ]
+
+        return jsonify({'success': True, 'order_items': order_items_list})
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
+        return jsonify({'message': 'An error occurred.', 'success': False}), 500
