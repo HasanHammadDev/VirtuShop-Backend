@@ -79,6 +79,7 @@ def get_cart(current_user):
         # Construct the order items list
         order_items_list = [
             {
+                'order_id': order_item.id,
                 'quantity': order_item.quantity,
                 'price': order_item.price,
                 'created_at': order_item.created_at,
