@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from Models import Product
+from Models import Product, Review
 from sqlalchemy.exc import SQLAlchemyError
 
 products_bp = Blueprint('products', __name__)
@@ -29,9 +29,18 @@ def get_products():
 @products_bp.route('/products/<int:id>', methods=['GET'])
 def get_product(id):
     try:
+        # Fetch the product
         product = Product.query.get(id)
+        
+        # Check if the product exists
         if not product:
             return jsonify({"error": "Product Not Found"}), 404
+
+        # Fetch product reviews
+        product_reviews = Review.query.filter_by(product_id=id).all()
+
+        total_rating = sum(review.rating for review in product_reviews)
+        product_rating = total_rating / len(product_reviews) if product_reviews else 0
         
         product_data = {
             "id": product.id,
@@ -40,7 +49,8 @@ def get_product(id):
             "price": str(product.price),
             "category": product.category,
             "imageUrl": product.image_url,
-            "created_at": product.created_at.isoformat()
+            "created_at": product.created_at.isoformat(),
+            "rating": product_rating
         }
         return jsonify(product_data), 200
     except SQLAlchemyError as e:
