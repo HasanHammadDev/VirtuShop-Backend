@@ -10,6 +10,7 @@ from Blueprints.Routes.login import login_bp
 from Blueprints.Routes.logout import logout_bp
 from Blueprints.Routes.profile import profile_bp
 from Blueprints.Routes.cart import cart_bp
+from Blueprints.Routes.reviews import reviews_bp
 
 
 load_dotenv()
@@ -30,6 +31,7 @@ app.register_blueprint(login_bp)
 app.register_blueprint(logout_bp)
 app.register_blueprint(profile_bp)
 app.register_blueprint(cart_bp)
+app.register_blueprint(reviews_bp)
 
 
 
