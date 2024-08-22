@@ -16,7 +16,9 @@ def get_products():
                 "price": str(product.price),
                 "category": product.category,
                 "imageUrl": product.image_url,
-                "created_at": product.created_at.isoformat()
+                "created_at": product.created_at.isoformat(),
+                "isOnSale": product.on_sale,
+                "salePrice": product.sale_price
             }
             for product in products
         ]
@@ -50,7 +52,9 @@ def get_product(id):
             "category": product.category,
             "imageUrl": product.image_url,
             "created_at": product.created_at.isoformat(),
-            "rating": product_rating
+            "rating": product_rating,
+            "isOnSale": product.on_sale,
+            "salePrice": product.sale_price
         }
         return jsonify(product_data), 200
     except SQLAlchemyError as e:
