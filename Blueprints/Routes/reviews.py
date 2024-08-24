@@ -59,4 +59,3 @@ def get_product_reviews(current_user, id):
     except Exception as e:
         print(f"An error occurred while fetching product reviews: {str(e)}")
         return jsonify({'message': 'An error occurred while fetching product reviews.', 'success': False}), 500
-        
