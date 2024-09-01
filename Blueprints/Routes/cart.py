@@ -149,3 +149,44 @@ def update_quantity(current_user):
     except Exception as e:
         logger.error(f"An unexpected error occurred: {str(e)}")
         return jsonify({'message': 'An unexpected error occurred.', 'success': False}), 500
+    
+@cart_bp.route('/remove-item', methods=['PUT'])
+@token_required
+def remove_item(current_user):
+    try:
+        product_info = request.get_json()
+        product_id = product_info.get('productId')
+
+        # Check if product info has been provided
+        if not product_info or not product_id:
+            return jsonify({'message': 'Product information has not been provided.', 'success': False}), 400
+
+        order = Order.query.filter_by(user_id=current_user.id, status='pending').first()
+
+        # Make sure the user has an order
+        if not order:
+            return jsonify({'message': 'This user does not have an order.', 'success': False}), 404
+
+        order_item = OrderItem.query.filter_by(order_id=order.id, product_id=product_id).first()
+
+        # Check if the order item exists
+        if not order_item:
+            return jsonify({'message': 'This item is not in the order.', 'success': False}), 404
+
+        # Remove the item from the order
+        db.session.delete(order_item)
+        
+        # Recalculate the order price
+        order.total_price -= order_item.price
+        db.session.commit()
+        
+        return jsonify({'message': 'Item has been removed successfully.', 'success': True}), 200
+
+    except SQLAlchemyError as e:
+        logger.error(f"A database error occurred: {str(e)}")
+        db.session.rollback()
+        return jsonify({'message': 'A database error occurred.', 'success': False}), 500
+
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {str(e)}")
+        return jsonify({'message': 'An unexpected error occurred.', 'success': False}), 500
